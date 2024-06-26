@@ -125,10 +125,6 @@
         // Adicionar produto ao Firebase
         productsRef.push(newProduct)
             .then(() => {
-                // Atualiza a lista de produtos no admin e no cliente
-                addProductsToAdmin();
-                addProductsToClient();
-
                 // Limpar os campos de entrada após adicionar o produto
                 document.getElementById('productName').value = '';
                 document.getElementById('productImage').value = '';
@@ -146,16 +142,13 @@
         productsListContainer.innerHTML = ''; // Limpar conteúdo anterior
 
         // Obter os produtos do Firebase e exibir
-        fetchProductsFromFirebase()
-            .then(products => {
-                products.forEach(product => {
-                    const productElement = createProductElement(product);
-                    productsListContainer.appendChild(productElement);
-                });
-            })
-            .catch(error => {
-                console.error('Erro ao obter produtos do Firebase:', error);
+        productsRef.once('value', snapshot => {
+            snapshot.forEach(childSnapshot => {
+                const product = childSnapshot.val();
+                const productElement = createProductElement(product);
+                productsListContainer.appendChild(productElement);
             });
+        });
     }
 
     // Função para adicionar produtos ao cliente
@@ -164,16 +157,13 @@
         productsListContainer.innerHTML = ''; // Limpar conteúdo anterior
 
         // Obter os produtos do Firebase e exibir
-        fetchProductsFromFirebase()
-            .then(products => {
-                products.forEach(product => {
-                    const productElement = createProductElement(product);
-                    productsListContainer.appendChild(productElement);
-                });
-            })
-            .catch(error => {
-                console.error('Erro ao obter produtos do Firebase:', error);
+        productsRef.once('value', snapshot => {
+            snapshot.forEach(childSnapshot => {
+                const product = childSnapshot.val();
+                const productElement = createProductElement(product);
+                productsListContainer.appendChild(productElement);
             });
+        });
     }
 
     // Função para criar elemento de produto
@@ -205,26 +195,6 @@
                 console.error('Erro ao excluir produto do Firebase:', error);
                 alert('Erro ao excluir produto. Por favor, tente novamente mais tarde.');
             });
-    }
-
-    // Função para obter produtos do Firebase
-    function fetchProductsFromFirebase() {
-        return new Promise((resolve, reject) => {
-            productsRef.once('value')
-                .then(snapshot => {
-                    const products = snapshot.val() || {};
-                    const productsArray = Object.keys(products).map(key => ({
-                        key: key,
-                        name: products[key].name,
-                        image: products[key].image,
-                        link: products[key].link
-                    }));
-                    resolve(productsArray);
-                })
-                .catch(error => {
-                    reject(error);
-                });
-        });
     }
 
     // Ao carregar a página, inicializa a lista de produtos no admin e cliente
