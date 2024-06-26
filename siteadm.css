@@ -1,0 +1,162 @@
+body{ 
+    background-color:#8b6444;
+    font-family: "Abel", sans-serif;
+    
+}
+
+.logo{
+    height: 550px;
+    width: 50%;
+    margin: 0 auto;
+    mix-blend-mode:lighten;
+}
+
+.admin-container{
+    background-color:#d5cabf;
+    color: #553921;
+    height: 600px;
+    width: 500px;
+    margin: 10px auto;
+    padding: 20px; 
+    border-radius: 30px;
+    box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
+}
+
+h2{
+    font-family: "Montserrat", sans-serif;
+  font-style: normal;
+  font-optical-sizing: auto;
+  font-weight: 400px;
+  font-style: normal;
+    font-size: 40px;
+    text-align: center;
+}
+
+h3{
+    margin-top: 40px;
+    font-size: 22px;
+    text-align: center;
+    text-align: center; 
+    font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400px;
+  font-style: normal;}
+
+input{
+    margin-top: 10px; 
+    width: calc(100% - 40px); 
+    margin-left: 20px; 
+    border-radius: 4px;
+    text-align: center; 
+    font-family: "Montserrat", sans-serif;
+    font-weight: 200px;
+    font-style: normal;
+    font-size: 15px;
+    color: #68472a;
+}
+
+button{
+    margin-top: 50px;
+    display: block; 
+    width: calc(100% - 40px); 
+    margin-left: 22px; 
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #704b2b;
+    color: #e0dad4;
+    cursor: pointer;
+    box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
+    text-align: center;
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400px;
+    font-style: normal;
+    font-size: 20px;
+}
+
+button:hover{
+    background-color: #543a1f;
+}
+.card {
+    width: 280px;
+    height: 350px;
+    background-color:#d5cabf;
+    box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px;
+    display: inline-block;
+    vertical-align: top; 
+    margin-top: 20px; 
+    text-align: center;
+    text-align: center; 
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400px;
+    font-style: normal;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.cards-container {
+    margin-top: 100px;
+    margin-left: 10px;
+    text-align: center; 
+}
+
+.product-info {
+    margin-top: 10px; 
+    padding: 10px;
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+
+}
+
+.product-info img {
+    margin-top: 10px;
+    max-width: 100%;
+    height: auto;
+}
+
+.product-image {
+    height: 200px; 
+    overflow: hidden;
+    position: relative; 
+    border-radius: 10px;
+}
+
+.product-image img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: 100%; 
+    object-fit: cover; 
+    position: relative; 
+    border-radius: 10px;
+}
+
+
+.product-info h3 {
+    font-size: 18px;
+    margin: 0;
+    text-align: center;
+}
+
+.excluir {
+    position: absolute;
+    bottom: 0;
+    left: 80px;
+    width: 100px;
+    padding: 10px ;
+    border: none;
+    border-radius: 10;
+    background-color: #704b2b;
+    color: #e0dad4;
+    cursor: pointer;
+}
+
+
+

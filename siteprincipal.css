@@ -1,0 +1,31 @@
+.hidden {
+    display: none;
+}
+
+.login-container{
+    background-color: #d5cabf;
+    height: 300px;
+    width: 500px;
+    margin: 0px auto;
+    padding: 20px; 
+    border-radius: 30px;
+    box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
+}
+.email{
+    height: 20px;
+    width: 400px;
+    margin-top: 60px;
+    margin-left: 50px;
+    color: #704b2b;
+}
+.botaop{
+    height: 50px;
+    width: 200px;
+    margin: 30px auto;
+}
+.botaov{
+    height: 50px;
+    width: 200px;
+    margin: 100px auto;
+    
+}

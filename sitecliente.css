@@ -1,0 +1,128 @@
+body{ 
+    background-color:#8b6444;
+    font-family: "Abel", sans-serif;
+    color: #e0dad4;
+}
+.logo{
+    height: 550px;
+    width: 50%;
+    margin-left: 380px;
+    mix-blend-mode:lighten;
+  
+}
+
+h1{
+    font-family: "Abel", sans-serif;
+    text-align: center;
+    font-size: 60px;
+    margin-top: 100px;
+    font-weight: 10px;
+    font-weight: 400px;
+    font-style: normal
+}
+.container{
+    margin-left: 20px;
+}
+
+.card {
+    color: #543a1f;
+    width: 280px;
+    height: 350px;
+    background: #d5cabf;
+    box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px;
+    display: inline-block;
+    vertical-align: top; 
+    text-align: center;
+    text-align: center; 
+    font-optical-sizing: auto;
+    font-weight: 400px;
+    font-style: normal;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 10px;
+    margin-top: 10px; 
+    padding: 10px;
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+}
+
+.cards-container {
+    margin-top: 100px;
+    margin-left: 10px;
+    text-align: center; 
+}
+
+.product-info {
+    margin-top: 10px; 
+    padding: 10px;
+    text-overflow: ellipsis; 
+   
+
+}
+
+.product-info img {
+    margin-top: 10px;
+    max-width: 100%;
+    height: auto;
+}
+
+.product-image {
+    height: 200px; 
+    overflow: hidden;
+    position: relative; 
+    border-radius: 10px;
+    margin-top:10px;
+}
+
+.product-image img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: 100%; 
+    object-fit: cover; 
+    position: relative; 
+}
+
+.card .product-image img {
+    height: 200px; 
+    overflow: hidden;
+    position: relative; 
+    border-radius: 10px;
+}
+
+.product-info h3 {
+    font-size: 22px;
+    margin: 0;
+    text-align: center;
+}
+
+.card.container .button-container {
+    text-align: center;
+}
+
+.button-container {
+    text-align: center;
+}
+
+.button-container button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #704b2b;
+    color: #e0dad4;
+    cursor: pointer;
+    font-size: 15px;
+    font-optical-sizing: auto;
+    font-weight: 400px;
+    font-style: normal;
+    margin-top: 20px;
+}
+
+.button-container button:hover {
+    background-color: #543a1f;
+}
+
