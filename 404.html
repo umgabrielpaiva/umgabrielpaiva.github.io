@@ -126,6 +126,9 @@
         // Armazene os produtos atualizados no armazenamento local
         localStorage.setItem('products', JSON.stringify(storedProducts));
 
+       // Adicionar produto ao Firebase
+       addProductToFirebase(productName, productImage, productLink);
+        
         // Atualiza a lista de produtos no admin e no cliente
         addProductsToAdmin();
         addProductsToClient();
