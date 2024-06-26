@@ -88,7 +88,7 @@
         document.getElementById('sitePrincipal').classList.add('hidden');
         document.getElementById('siteAdmin').classList.remove('hidden');
         document.getElementById('siteCliente').classList.add('hidden');
-        fetchProductsAndUpdateUI(); // Atualiza a lista de produtos no admin ao entrar
+        addProductsToAdmin(); // Atualiza a lista de produtos no admin ao entrar
     }
 
     // Função para exibir o site do Cliente e ocultar os outros
@@ -96,7 +96,7 @@
         document.getElementById('sitePrincipal').classList.add('hidden');
         document.getElementById('siteAdmin').classList.add('hidden');
         document.getElementById('siteCliente').classList.remove('hidden');
-        fetchProductsAndUpdateUI(); // Atualiza a lista de produtos no cliente ao mostrar
+        addProductsToClient(); // Atualiza a lista de produtos no cliente ao mostrar
     }
 
     // Função para voltar à página principal (sitePrincipal)
@@ -114,16 +114,12 @@
 
         const newProduct = { name: productName, image: productImage, link: productLink };
 
-        // Adicionar produto ao localStorage
-        const storedProducts = JSON.parse(localStorage.getItem('products')) || [];
-        storedProducts.push(newProduct);
-        localStorage.setItem('products', JSON.stringify(storedProducts));
-
         // Adicionar produto ao Firebase
         addProductToFirebase(productName, productImage, productLink)
             .then(() => {
                 // Atualiza a lista de produtos no admin e no cliente
-                fetchProductsAndUpdateUI();
+                addProductsToAdmin();
+                addProductsToClient();
 
                 // Limpar os campos de entrada após adicionar o produto
                 document.getElementById('productName').value = '';
@@ -135,21 +131,58 @@
             });
     }
 
-    // Função para excluir um produto
-    function deleteProduct(productName, source) {
-        let storedProducts = JSON.parse(localStorage.getItem('products')) || [];
-        // Encontrar o índice do produto pelo nome
-        const index = storedProducts.findIndex(product => product.name === productName);
-        if (index !== -1) {
-            storedProducts.splice(index, 1); // Remove o produto da lista
-            localStorage.setItem('products', JSON.stringify(storedProducts)); // Atualiza o armazenamento local
-            fetchProductsAndUpdateUI(); // Atualiza a lista de produtos no admin e no cliente
-        }
+    // Função para adicionar produtos ao admin
+    function addProductsToAdmin() {
+        const productsListContainer = document.getElementById('products-list-admin');
+        productsListContainer.innerHTML = ''; // Limpar conteúdo anterior
+
+        // Obter os produtos do localStorage
+        const storedProducts = JSON.parse(localStorage.getItem('products')) || [];
+
+        // Exibir os produtos do localStorage
+        storedProducts.forEach(product => {
+            const productElement = createProductElement(product);
+            productsListContainer.appendChild(productElement);
+        });
+
+        // Obter os produtos do Firebase e exibir
+        fetchProductsFromFirebase('admin')
+            .then(products => {
+                products.forEach(product => {
+                    const productElement = createProductElement(product);
+                    productsListContainer.appendChild(productElement);
+                });
+            })
+            .catch(error => {
+                console.error('Erro ao obter produtos do Firebase:', error);
+            });
     }
 
-    // Função para redirecionar para o link do produto
-    function redirectToProduct(productLink) {
-        window.open(productLink, '_blank'); // Abre o link em uma nova aba
+    // Função para adicionar produtos ao cliente
+    function addProductsToClient() {
+        const productsListContainer = document.getElementById('products-list-cliente');
+        productsListContainer.innerHTML = ''; // Limpar conteúdo anterior
+
+        // Obter os produtos do localStorage
+        const storedProducts = JSON.parse(localStorage.getItem('products')) || [];
+
+        // Exibir os produtos do localStorage
+        storedProducts.forEach(product => {
+            const productElement = createProductElement(product);
+            productsListContainer.appendChild(productElement);
+        });
+
+        // Obter os produtos do Firebase e exibir
+        fetchProductsFromFirebase('cliente')
+            .then(products => {
+                products.forEach(product => {
+                    const productElement = createProductElement(product);
+                    productsListContainer.appendChild(productElement);
+                });
+            })
+            .catch(error => {
+                console.error('Erro ao obter produtos do Firebase:', error);
+            });
     }
 
     // Função para criar elemento de produto
@@ -164,59 +197,64 @@
             <div class="product-image">
                 <img src="${product.image}" alt="${product.name}">
             </div>
-            <button class="excluir" onclick="deleteProduct('${product.name}', 'admin')">Excluir</button>
+            <button class="excluir" onclick="deleteProduct('${product.name}')">Excluir</button>
         `;
         return productElement;
     }
 
-    // Função para adicionar produtos ao admin UI
-    function addProductsToAdminUI(products) {
-        const productsListContainer = document.getElementById('products-list-admin');
-        productsListContainer.innerHTML = '';
-
-        if (products) {
-            Object.keys(products).forEach(key => {
-                const product = products[key];
-                const productElement = createProductElement(product);
-                productsListContainer.appendChild(productElement);
-            });
+    // Função para excluir um produto
+    function deleteProduct(productName) {
+        let storedProducts = JSON.parse(localStorage.getItem('products')) || [];
+        // Encontrar o índice do produto pelo nome
+        const index = storedProducts.findIndex(product => product.name === productName);
+        if (index !== -1) {
+            storedProducts.splice(index, 1); // Remove o produto da lista
+            localStorage.setItem('products', JSON.stringify(storedProducts)); // Atualiza o armazenamento local
+            // Atualiza a lista de produtos no admin e no cliente
+            addProductsToAdmin();
+            addProductsToClient();
         }
     }
 
-    // Função para adicionar produtos ao cliente UI
-    function addProductsToClientUI(products) {
-        const productsListContainer = document.getElementById('products-list-cliente');
-        productsListContainer.innerHTML = '';
-
-        if (products) {
-            Object.keys(products).forEach(key => {
-                const product = products[key];
-                const productElement = createProductElement(product);
-                productsListContainer.appendChild(productElement);
+    // Função para adicionar um produto no Firebase Realtime Database
+    function addProductToFirebase(productName, productImage, productLink) {
+        return new Promise((resolve, reject) => {
+            const productsRef = database.ref('products');
+            productsRef.push({
+                name: productName,
+                image: productImage,
+                link: productLink
+            }, error => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve();
+                }
             });
-        }
-    }
-
-    // Função para obter produtos do Firebase e atualizar na UI do admin e cliente
-    function fetchProductsAndUpdateUI() {
-        const productsRef = database.ref('products');
-
-        // Para admin
-        productsRef.once('value', (snapshot) => {
-            const storedProducts = snapshot.val();
-            addProductsToAdminUI(storedProducts);
         });
+    }
 
-        // Para cliente
-        productsRef.once('value', (snapshot) => {
-            const storedProducts = snapshot.val();
-            addProductsToClientUI(storedProducts);
+    // Função para obter produtos do Firebase Realtime Database
+    function fetchProductsFromFirebase(source) {
+        return new Promise((resolve, reject) => {
+            const productsRef = database.ref('products');
+            productsRef.once('value', snapshot => {
+                const products = snapshot.val();
+                if (products) {
+                    resolve(Object.values(products));
+                } else {
+                    resolve([]);
+                }
+            }, error => {
+                reject(error);
+            });
         });
     }
 
     // Ao carregar a página, inicializa a lista de produtos no admin e cliente
     window.addEventListener('load', function() {
-        fetchProductsAndUpdateUI();
+        addProductsToAdmin();
+        addProductsToClient();
     });
 </script>
 
