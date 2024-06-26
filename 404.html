@@ -16,25 +16,28 @@
     <!-- Estilos específicos para siteCliente -->
     <link rel="stylesheet" href="sitecliente.css">
 
-    <!-- Adicione os scripts do Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-database.js"></script>
+    <!-- Firebase scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-database.js"></script>
 
-<script>
-  // Configuração do Firebase
-  const firebaseConfig = {
-    apiKey: "AIzaSyB3uGa04ikZGC9j75RwP7NPplrYFRHEnpg",
-  authDomain: "helenahomestyle-e84cb.firebaseapp.com",
-  projectId: "helenahomestyle-e84cb",
-  storageBucket: "helenahomestyle-e84cb.appspot.com",
-  messagingSenderId: "1061462141336",
-  appId: "1:1061462141336:web:f0e6039cccf52c9fa423ed",
-  measurementId: "G-PK525KX89C"
-  };
+    <script>
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyB3uGa04ikZGC9j75RwP7NPplrYFRHEnpg",
+            authDomain: "helenahomestyle-e84cb.firebaseapp.com",
+            projectId: "helenahomestyle-e84cb",
+            storageBucket: "helenahomestyle-e84cb.appspot.com",
+            messagingSenderId: "1061462141336",
+            appId: "1:1061462141336:web:f0e6039cccf52c9fa423ed",
+            measurementId: "G-PK525KX89C"
+        };
 
-  // Inicialize o Firebase
-  firebase.initializeApp(firebaseConfig);
-</script>
+        // Inicialize o Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        // Referência para o banco de dados do Firebase
+        const database = firebase.database();
+    </script>
 
 </head>
 <body>
@@ -43,29 +46,23 @@
 <div id="sitePrincipal">
     <img class="logo" src="logo.jpg" alt="">
     <div class="login-container">
-    <input class="email" type="email" id="emailInput" placeholder="Digite seu e-mail">
-    <button  class="botaop" onclick="entrar()">Entrar</button>
-    <button class="botaop"  onclick="mostrarSiteCliente()">Sou um Cliente</button>
-</div>
-
+        <input class="email" type="email" id="emailInput" placeholder="Digite seu e-mail">
+        <button class="botaop" onclick="entrar()">Entrar</button>
+        <button class="botaop"  onclick="mostrarSiteCliente()">Sou um Cliente</button>
+    </div>
 </div>
 
 <!-- siteAdmin -->
 <div id="siteAdmin" class="hidden">
-    
     <img class="logo" src="logo.jpg" alt="">
     <div class="admin-container">
         <h2>Adicionar Produto</h2>
-    
         <h3> Digite o Nome do Produto</h3>
         <input type="text" id="productName" placeholder="Nome do Produto"><br>
-    
         <h3> Cole a URL da Imagem</h3>
         <input type="text" id="productImage" placeholder="URL da Imagem"><br>
-    
         <h3> Cole o Link do Produto</h3>
         <input type="text" id="productLink" placeholder="Link do Produto"><br>
-    
         <button onclick="addProduct()">Enviar</button>
     </div>
     <div id="products-list-container-admin" class="cards-container">
@@ -91,7 +88,7 @@
         document.getElementById('sitePrincipal').classList.add('hidden');
         document.getElementById('siteAdmin').classList.remove('hidden');
         document.getElementById('siteCliente').classList.add('hidden');
-        addProductsToAdmin(); // Atualiza a lista de produtos no admin ao entrar
+        fetchProductsAndUpdateUI(); // Atualiza a lista de produtos no admin ao entrar
     }
 
     // Função para exibir o site do Cliente e ocultar os outros
@@ -99,7 +96,7 @@
         document.getElementById('sitePrincipal').classList.add('hidden');
         document.getElementById('siteAdmin').classList.add('hidden');
         document.getElementById('siteCliente').classList.remove('hidden');
-        addProductsToClient(); // Atualiza a lista de produtos no cliente ao mostrar
+        fetchProductsAndUpdateUI(); // Atualiza a lista de produtos no cliente ao mostrar
     }
 
     // Função para voltar à página principal (sitePrincipal)
@@ -117,76 +114,25 @@
 
         const newProduct = { name: productName, image: productImage, link: productLink };
 
-        // Obtenha os produtos armazenados localmente ou inicialize um array vazio
+        // Adicionar produto ao localStorage
         const storedProducts = JSON.parse(localStorage.getItem('products')) || [];
-
-        // Adicione o novo produto ao array
         storedProducts.push(newProduct);
-
-        // Armazene os produtos atualizados no armazenamento local
         localStorage.setItem('products', JSON.stringify(storedProducts));
 
-       // Adicionar produto ao Firebase
-       addProductToFirebase(productName, productImage, productLink);
-        
-        // Atualiza a lista de produtos no admin e no cliente
-        addProductsToAdmin();
-        addProductsToClient();
+        // Adicionar produto ao Firebase
+        addProductToFirebase(productName, productImage, productLink)
+            .then(() => {
+                // Atualiza a lista de produtos no admin e no cliente
+                fetchProductsAndUpdateUI();
 
-        // Limpa os campos de entrada após adicionar o produto
-        document.getElementById('productName').value = '';
-        document.getElementById('productImage').value = '';
-        document.getElementById('productLink').value = '';
-    }
-
-    // Função para adicionar produtos ao admin
-    function addProductsToAdmin() {
-        const productsListContainer = document.getElementById('products-list-admin');
-        productsListContainer.innerHTML = ''; // Limpar conteúdo anterior
-
-        const storedProducts = JSON.parse(localStorage.getItem('products')) || [];
-
-        storedProducts.forEach(product => {
-            const productElement = document.createElement('div');
-            productElement.classList.add('product-item');
-            productElement.classList.add('card'); // Adiciona classe card ao elemento
-            productElement.innerHTML = `
-                <div class="product-info">
-                    <h3>${product.name}</h3>
-                </div>
-                <div class="product-image">
-                    <img src="${product.image}" alt="${product.name}">
-                </div>
-                <button class="excluir" onclick="deleteProduct('${product.name}', 'admin')">Excluir</button>
-            `;
-            productsListContainer.appendChild(productElement);
-        });
-    }
-
-    // Função para adicionar produtos ao cliente
-    function addProductsToClient() {
-        const productsListContainer = document.getElementById('products-list-cliente');
-        productsListContainer.innerHTML = ''; // Limpar conteúdo anterior
-
-        const storedProducts = JSON.parse(localStorage.getItem('products')) || [];
-
-        storedProducts.forEach(product => {
-            const productElement = document.createElement('div');
-            productElement.classList.add('product-item');
-            productElement.classList.add('card'); // Adiciona classe card ao elemento
-            productElement.innerHTML = `
-                <div class="product-info">
-                    <h3>${product.name}</h3>
-                </div>
-                <div class="product-image">
-                    <img src="${product.image}" alt="${product.name}">
-                </div>
-                <div class="button-container">
-                    <button onclick="redirectToProduct('${product.link}')">Veja mais</button>
-                </div>
-            `;
-            productsListContainer.appendChild(productElement);
-        });
+                // Limpar os campos de entrada após adicionar o produto
+                document.getElementById('productName').value = '';
+                document.getElementById('productImage').value = '';
+                document.getElementById('productLink').value = '';
+            })
+            .catch(error => {
+                console.error('Erro ao adicionar produto no Firebase:', error);
+            });
     }
 
     // Função para excluir um produto
@@ -197,11 +143,7 @@
         if (index !== -1) {
             storedProducts.splice(index, 1); // Remove o produto da lista
             localStorage.setItem('products', JSON.stringify(storedProducts)); // Atualiza o armazenamento local
-            if (source === 'admin') {
-                addProductsToAdmin(); // Atualiza a lista de produtos no admin
-            } else {
-                addProductsToClient(); // Atualiza a lista de produtos no cliente
-            }
+            fetchProductsAndUpdateUI(); // Atualiza a lista de produtos no admin e no cliente
         }
     }
 
@@ -210,79 +152,73 @@
         window.open(productLink, '_blank'); // Abre o link em uma nova aba
     }
 
-    // Ao carregar a página, inicializa a lista de produtos no admin e cliente
-    window.addEventListener('load', function() {
-        addProductsToAdmin();
-        addProductsToClient();
-    });
-</script>
+    // Função para criar elemento de produto
+    function createProductElement(product) {
+        const productElement = document.createElement('div');
+        productElement.classList.add('product-item');
+        productElement.classList.add('card');
+        productElement.innerHTML = `
+            <div class="product-info">
+                <h3>${product.name}</h3>
+            </div>
+            <div class="product-image">
+                <img src="${product.image}" alt="${product.name}">
+            </div>
+            <button class="excluir" onclick="deleteProduct('${product.name}', 'admin')">Excluir</button>
+        `;
+        return productElement;
+    }
 
-<script>
-    // Função para adicionar um produto no Firebase Realtime Database
-    function addProductToFirebase(productName, productImage, productLink) {
-      const productsRef = firebase.database().ref('products');
-      productsRef.push({
-        name: productName,
-        image: productImage,
-        link: productLink
-      });
-    }
-  
-    // Função para obter produtos do Firebase Realtime Database e atualizar no admin e cliente
-    function fetchProductsAndUpdateUI() {
-      const productsRef = firebase.database().ref('products');
-  
-      // Para admin
-      productsRef.on('value', (snapshot) => {
-        const storedProducts = snapshot.val();
-        addProductsToAdminUI(storedProducts);
-      });
-  
-      // Para cliente
-      productsRef.on('value', (snapshot) => {
-        const storedProducts = snapshot.val();
-        addProductsToClientUI(storedProducts);
-      });
-    }
-  
     // Função para adicionar produtos ao admin UI
     function addProductsToAdminUI(products) {
-      const productsListContainer = document.getElementById('products-list-admin');
-      productsListContainer.innerHTML = '';
-  
-      if (products) {
-        Object.keys(products).forEach(key => {
-          const product = products[key];
-          const productElement = document.createElement('div');
-          // Construa o elemento do produto como antes
-          // ...
-          productsListContainer.appendChild(productElement);
-        });
-      }
+        const productsListContainer = document.getElementById('products-list-admin');
+        productsListContainer.innerHTML = '';
+
+        if (products) {
+            Object.keys(products).forEach(key => {
+                const product = products[key];
+                const productElement = createProductElement(product);
+                productsListContainer.appendChild(productElement);
+            });
+        }
     }
-  
+
     // Função para adicionar produtos ao cliente UI
     function addProductsToClientUI(products) {
-      const productsListContainer = document.getElementById('products-list-cliente');
-      productsListContainer.innerHTML = '';
-  
-      if (products) {
-        Object.keys(products).forEach(key => {
-          const product = products[key];
-          const productElement = document.createElement('div');
-          // Construa o elemento do produto como antes
-          // ...
-          productsListContainer.appendChild(productElement);
-        });
-      }
+        const productsListContainer = document.getElementById('products-list-cliente');
+        productsListContainer.innerHTML = '';
+
+        if (products) {
+            Object.keys(products).forEach(key => {
+                const product = products[key];
+                const productElement = createProductElement(product);
+                productsListContainer.appendChild(productElement);
+            });
+        }
     }
-  
-    // Chamada inicial para carregar os produtos ao carregar a página
+
+    // Função para obter produtos do Firebase e atualizar na UI do admin e cliente
+    function fetchProductsAndUpdateUI() {
+        const productsRef = database.ref('products');
+
+        // Para admin
+        productsRef.once('value', (snapshot) => {
+            const storedProducts = snapshot.val();
+            addProductsToAdminUI(storedProducts);
+        });
+
+        // Para cliente
+        productsRef.once('value', (snapshot) => {
+            const storedProducts = snapshot.val();
+            addProductsToClientUI(storedProducts);
+        });
+    }
+
+    // Ao carregar a página, inicializa a lista de produtos no admin e cliente
     window.addEventListener('load', function() {
-      fetchProductsAndUpdateUI();
+        fetchProductsAndUpdateUI();
     });
-  </script>
-  
+</script>
 
 </body>
 </html>
