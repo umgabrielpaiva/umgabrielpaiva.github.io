@@ -115,8 +115,11 @@
         const newProduct = { name: productName, image: productImage, link: productLink };
 
         // Adicionar produto ao Firebase
-        addProductToFirebase(productName, productImage, productLink)
+        addProductToFirebase(newProduct)
             .then(() => {
+                // Adicionar produto ao localStorage
+                addProductToLocal(newProduct);
+
                 // Atualiza a lista de produtos no admin e no cliente
                 addProductsToAdmin();
                 addProductsToClient();
@@ -127,7 +130,7 @@
                 document.getElementById('productLink').value = '';
             })
             .catch(error => {
-                console.error('Erro ao adicionar produto no Firebase:', error);
+                console.error('Erro ao adicionar produto:', error);
             });
     }
 
@@ -146,7 +149,7 @@
         });
 
         // Obter os produtos do Firebase e exibir
-        fetchProductsFromFirebase('admin')
+        fetchProductsFromFirebase()
             .then(products => {
                 products.forEach(product => {
                     const productElement = createProductElement(product);
@@ -173,7 +176,7 @@
         });
 
         // Obter os produtos do Firebase e exibir
-        fetchProductsFromFirebase('cliente')
+        fetchProductsFromFirebase()
             .then(products => {
                 products.forEach(product => {
                     const productElement = createProductElement(product);
@@ -202,29 +205,11 @@
         return productElement;
     }
 
-    // Função para excluir um produto
-    function deleteProduct(productName) {
-        let storedProducts = JSON.parse(localStorage.getItem('products')) || [];
-        // Encontrar o índice do produto pelo nome
-        const index = storedProducts.findIndex(product => product.name === productName);
-        if (index !== -1) {
-            storedProducts.splice(index, 1); // Remove o produto da lista
-            localStorage.setItem('products', JSON.stringify(storedProducts)); // Atualiza o armazenamento local
-            // Atualiza a lista de produtos no admin e no cliente
-            addProductsToAdmin();
-            addProductsToClient();
-        }
-    }
-
-    // Função para adicionar um produto no Firebase Realtime Database
-    function addProductToFirebase(productName, productImage, productLink) {
+    // Função para adicionar um produto ao Firebase Realtime Database
+    function addProductToFirebase(product) {
         return new Promise((resolve, reject) => {
             const productsRef = database.ref('products');
-            productsRef.push({
-                name: productName,
-                image: productImage,
-                link: productLink
-            }, error => {
+            productsRef.push(product, error => {
                 if (error) {
                     reject(error);
                 } else {
@@ -235,7 +220,7 @@
     }
 
     // Função para obter produtos do Firebase Realtime Database
-    function fetchProductsFromFirebase(source) {
+    function fetchProductsFromFirebase() {
         return new Promise((resolve, reject) => {
             const productsRef = database.ref('products');
             productsRef.once('value', snapshot => {
@@ -249,6 +234,33 @@
                 reject(error);
             });
         });
+    }
+
+    // Função para adicionar um produto ao localStorage
+    function addProductToLocal(product) {
+        // Obter os produtos armazenados localmente ou inicializar um array vazio
+        const storedProducts = JSON.parse(localStorage.getItem('products')) || [];
+
+        // Adicionar o novo produto ao array
+        storedProducts.push(product);
+
+        // Armazenar os produtos atualizados no armazenamento local
+        localStorage.setItem('products', JSON.stringify(storedProducts));
+    }
+
+    // Função para excluir um produto
+    function deleteProduct(productName) {
+        let storedProducts = JSON.parse(localStorage.getItem('products')) || [];
+
+        // Encontrar o índice do produto pelo nome
+        const index = storedProducts.findIndex(product => product.name === productName);
+        if (index !== -1) {
+            storedProducts.splice(index, 1); // Remove o produto da lista
+            localStorage.setItem('products', JSON.stringify(storedProducts)); // Atualiza o armazenamento local
+            // Atualiza a lista de produtos no admin e no cliente
+            addProductsToAdmin();
+            addProductsToClient();
+        }
     }
 
     // Ao carregar a página, inicializa a lista de produtos no admin e cliente
