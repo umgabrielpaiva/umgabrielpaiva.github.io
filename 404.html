@@ -37,6 +37,9 @@
         
         // Referência para o banco de dados do Firebase
         const database = firebase.database();
+        
+        // Referência para o nó 'products'
+        const productsRef = database.ref('products');
     </script>
 
 </head>
@@ -108,14 +111,19 @@
 
     // Função para adicionar um produto
     function addProduct() {
-        const productName = document.getElementById('productName').value;
-        const productImage = document.getElementById('productImage').value;
-        const productLink = document.getElementById('productLink').value;
+        const productName = document.getElementById('productName').value.trim();
+        const productImage = document.getElementById('productImage').value.trim();
+        const productLink = document.getElementById('productLink').value.trim();
+
+        if (!productName || !productImage || !productLink) {
+            alert('Por favor, preencha todos os campos.');
+            return;
+        }
 
         const newProduct = { name: productName, image: productImage, link: productLink };
 
         // Adicionar produto ao Firebase
-        addProductToFirebase(newProduct)
+        productsRef.push(newProduct)
             .then(() => {
                 // Adicionar produto ao localStorage
                 addProductToLocal(newProduct);
@@ -131,6 +139,7 @@
             })
             .catch(error => {
                 console.error('Erro ao adicionar produto:', error);
+                alert('Erro ao adicionar produto. Por favor, tente novamente mais tarde.');
             });
     }
 
@@ -138,15 +147,6 @@
     function addProductsToAdmin() {
         const productsListContainer = document.getElementById('products-list-admin');
         productsListContainer.innerHTML = ''; // Limpar conteúdo anterior
-
-        // Obter os produtos do localStorage
-        const storedProducts = JSON.parse(localStorage.getItem('products')) || [];
-
-        // Exibir os produtos do localStorage
-        storedProducts.forEach(product => {
-            const productElement = createProductElement(product);
-            productsListContainer.appendChild(productElement);
-        });
 
         // Obter os produtos do Firebase e exibir
         fetchProductsFromFirebase()
@@ -165,15 +165,6 @@
     function addProductsToClient() {
         const productsListContainer = document.getElementById('products-list-cliente');
         productsListContainer.innerHTML = ''; // Limpar conteúdo anterior
-
-        // Obter os produtos do localStorage
-        const storedProducts = JSON.parse(localStorage.getItem('products')) || [];
-
-        // Exibir os produtos do localStorage
-        storedProducts.forEach(product => {
-            const productElement = createProductElement(product);
-            productsListContainer.appendChild(productElement);
-        });
 
         // Obter os produtos do Firebase e exibir
         fetchProductsFromFirebase()
@@ -200,40 +191,9 @@
             <div class="product-image">
                 <img src="${product.image}" alt="${product.name}">
             </div>
-            <button class="excluir" onclick="deleteProduct('${product.name}')">Excluir</button>
+            <button class="excluir" onclick="deleteProduct('${product.key}')">Excluir</button>
         `;
         return productElement;
-    }
-
-    // Função para adicionar um produto ao Firebase Realtime Database
-    function addProductToFirebase(product) {
-        return new Promise((resolve, reject) => {
-            const productsRef = database.ref('products');
-            productsRef.push(product, error => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve();
-                }
-            });
-        });
-    }
-
-    // Função para obter produtos do Firebase Realtime Database
-    function fetchProductsFromFirebase() {
-        return new Promise((resolve, reject) => {
-            const productsRef = database.ref('products');
-            productsRef.once('value', snapshot => {
-                const products = snapshot.val();
-                if (products) {
-                    resolve(Object.values(products));
-                } else {
-                    resolve([]);
-                }
-            }, error => {
-                reject(error);
-            });
-        });
     }
 
     // Função para adicionar um produto ao localStorage
@@ -249,18 +209,52 @@
     }
 
     // Função para excluir um produto
-    function deleteProduct(productName) {
+    function deleteProduct(productKey) {
+        productsRef.child(productKey).remove()
+            .then(() => {
+                // Remover o produto do localStorage
+                removeProductFromLocal(productKey);
+
+                // Atualiza a lista de produtos no admin e no cliente
+                addProductsToAdmin();
+                addProductsToClient();
+            })
+            .catch(error => {
+                console.error('Erro ao excluir produto do Firebase:', error);
+                alert('Erro ao excluir produto. Por favor, tente novamente mais tarde.');
+            });
+    }
+
+    // Função para remover um produto do localStorage
+    function removeProductFromLocal(productKey) {
         let storedProducts = JSON.parse(localStorage.getItem('products')) || [];
 
-        // Encontrar o índice do produto pelo nome
-        const index = storedProducts.findIndex(product => product.name === productName);
+        // Encontrar o índice do produto pelo key
+        const index = storedProducts.findIndex(product => product.key === productKey);
         if (index !== -1) {
             storedProducts.splice(index, 1); // Remove o produto da lista
             localStorage.setItem('products', JSON.stringify(storedProducts)); // Atualiza o armazenamento local
-            // Atualiza a lista de produtos no admin e no cliente
-            addProductsToAdmin();
-            addProductsToClient();
         }
+    }
+
+    // Função para obter produtos do Firebase
+    function fetchProductsFromFirebase() {
+        return new Promise((resolve, reject) => {
+            productsRef.once('value')
+                .then(snapshot => {
+                    const products = snapshot.val() || {};
+                    const productsArray = Object.keys(products).map(key => ({
+                        key: key,
+                        name: products[key].name,
+                        image: products[key].image,
+                        link: products[key].link
+                    }));
+                    resolve(productsArray);
+                })
+                .catch(error => {
+                    reject(error);
+                });
+        });
     }
 
     // Ao carregar a página, inicializa a lista de produtos no admin e cliente
