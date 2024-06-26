@@ -125,9 +125,6 @@
         // Adicionar produto ao Firebase
         productsRef.push(newProduct)
             .then(() => {
-                // Adicionar produto ao localStorage
-                addProductToLocal(newProduct);
-
                 // Atualiza a lista de produtos no admin e no cliente
                 addProductsToAdmin();
                 addProductsToClient();
@@ -196,25 +193,10 @@
         return productElement;
     }
 
-    // Função para adicionar um produto ao localStorage
-    function addProductToLocal(product) {
-        // Obter os produtos armazenados localmente ou inicializar um array vazio
-        const storedProducts = JSON.parse(localStorage.getItem('products')) || [];
-
-        // Adicionar o novo produto ao array
-        storedProducts.push(product);
-
-        // Armazenar os produtos atualizados no armazenamento local
-        localStorage.setItem('products', JSON.stringify(storedProducts));
-    }
-
     // Função para excluir um produto
     function deleteProduct(productKey) {
         productsRef.child(productKey).remove()
             .then(() => {
-                // Remover o produto do localStorage
-                removeProductFromLocal(productKey);
-
                 // Atualiza a lista de produtos no admin e no cliente
                 addProductsToAdmin();
                 addProductsToClient();
@@ -223,18 +205,6 @@
                 console.error('Erro ao excluir produto do Firebase:', error);
                 alert('Erro ao excluir produto. Por favor, tente novamente mais tarde.');
             });
-    }
-
-    // Função para remover um produto do localStorage
-    function removeProductFromLocal(productKey) {
-        let storedProducts = JSON.parse(localStorage.getItem('products')) || [];
-
-        // Encontrar o índice do produto pelo key
-        const index = storedProducts.findIndex(product => product.key === productKey);
-        if (index !== -1) {
-            storedProducts.splice(index, 1); // Remove o produto da lista
-            localStorage.setItem('products', JSON.stringify(storedProducts)); // Atualiza o armazenamento local
-        }
     }
 
     // Função para obter produtos do Firebase
