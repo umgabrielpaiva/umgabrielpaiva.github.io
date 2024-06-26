@@ -129,6 +129,8 @@
                 document.getElementById('productName').value = '';
                 document.getElementById('productImage').value = '';
                 document.getElementById('productLink').value = '';
+                // Atualizar a lista de produtos após adicionar
+                addProductsToAdmin();
             })
             .catch(error => {
                 console.error('Erro ao adicionar produto:', error);
