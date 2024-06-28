@@ -9,32 +9,26 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="icone.png">
     <link rel="stylesheet" href="siteprincipal.css">
-
-    <!-- Estilos específicos para siteAdmin -->
     <link rel="stylesheet" href="siteadm.css">
-
-    <!-- Estilos específicos para siteCliente -->
     <link rel="stylesheet" href="sitecliente.css">
-
-    <!-- Firebase scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-database.js"></script>
 
     <script>
         // Configuração do Firebase
         const firebaseConfig = {
-            apiKey: "AIzaSyB3uGa04ikZGC9j75RwP7NPplrYFRHEnpg",
-            authDomain: "helenahomestyle-e84cb.firebaseapp.com",
-            projectId: "helenahomestyle-e84cb",
-            storageBucket: "helenahomestyle-e84cb.appspot.com",
-            messagingSenderId: "1061462141336",
-            appId: "1:1061462141336:web:f0e6039cccf52c9fa423ed",
-            measurementId: "G-PK525KX89C"
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_AUTH_DOMAIN",
+            projectId: "SEU_PROJECT_ID",
+            storageBucket: "SEU_STORAGE_BUCKET",
+            messagingSenderId: "SEU_SENDER_ID",
+            appId: "SEU_APP_ID",
+            measurementId: "SUA_MEDIDA_ID"
         };
 
         // Inicialize o Firebase
         firebase.initializeApp(firebaseConfig);
-        
+
         // Referência para o banco de dados do Firebase
         const database = firebase.database();
         
@@ -84,7 +78,6 @@
     <button class="botaov" onclick="voltar()">Voltar</button> <!-- Botão Voltar adicionado -->
 </div>
 
-<!-- Scripts -->
 <script>
     // Função para exibir o site do Admin e ocultar os outros
     function entrar() {
@@ -147,6 +140,7 @@
         productsRef.once('value', snapshot => {
             snapshot.forEach(childSnapshot => {
                 const product = childSnapshot.val();
+                product.key = childSnapshot.key; // Adicionar a chave do produto
                 const productElement = createProductElement(product);
                 productsListContainer.appendChild(productElement);
             });
