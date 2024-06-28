@@ -113,7 +113,11 @@
             return;
         }
 
-        const newProduct = { name: productName, image: productImage, link: productLink };
+        const newProduct = {
+            name: productName,
+            image: productImage,
+            link: productLink
+        };
 
         // Adicionar produto ao Firebase
         productsRef.push(newProduct)
