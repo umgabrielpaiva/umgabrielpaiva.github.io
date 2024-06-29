@@ -11,10 +11,33 @@
     <link rel="stylesheet" href="siteprincipal.css">
     <link rel="stylesheet" href="siteadm.css">
     <link rel="stylesheet" href="sitecliente.css">
-
+    <style>
+        .hidden {
+            display: none;
+        }
+        .card {
+            border: 1px solid #ccc;
+            margin: 10px;
+            padding: 10px;
+        }
+        .product-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .product-info h3 {
+            margin: 10px 0;
+        }
+        .product-image img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
 </head>
 <body>
-'
+
 <!-- sitePrincipal -->
 <div id="sitePrincipal">
     <img class="logo" src="logo.jpg" alt="">
@@ -39,9 +62,10 @@
         <button onclick="addProduct()">Enviar</button>
     </div>
     <div id="products-list-container-admin" class="cards-container">
-        <div id="products-list-admin"></div>
+        <h2>Produtos no Admin</h2>
+        <div id="products-list-admin" class="cards-container"></div>
     </div>
-    <button class="botaov" onclick="voltar()">Voltar</button> <!-- Botão Voltar adicionado -->
+    <button class="botaov" onclick="voltar()">Voltar</button>
 </div>
 
 <!-- siteCliente -->
@@ -49,12 +73,31 @@
     <img class="logo" src="logo.jpg" alt="">
     <h1> Meus Produtos Favoritos</h1>
     <div id="products-list-container-cliente" class="cards-container">
-        <div id="products-list-cliente"></div>
+        <h2>Meus Produtos Favoritos</h2>
+        <div id="products-list-cliente" class="cards-container"></div>
     </div>
-    <button class="botaov" onclick="voltar()">Voltar</button> <!-- Botão Voltar adicionado -->
+    <button class="botaov" onclick="voltar()">Voltar</button>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-database.js"></script>
 <script>
+    // Configuração do Firebase - substitua pelas suas credenciais e configurações
+    const firebaseConfig = {
+        apiKey: "SUA_API_KEY",
+        authDomain: "SEU_AUTH_DOMAIN",
+        databaseURL: "SUA_DATABASE_URL",
+        projectId: "SEU_PROJECT_ID",
+        storageBucket: "SEU_STORAGE_BUCKET",
+        messagingSenderId: "SEU_SENDER_ID",
+        appId: "SEU_APP_ID"
+    };
+
+    // Inicializa o Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    const productsRef = database.ref('products');
+
     // Função para exibir o site do Admin e ocultar os outros
     function entrar() {
         document.getElementById('sitePrincipal').classList.add('hidden');
@@ -97,13 +140,14 @@
 
         // Adicionar produto ao Firebase
         productsRef.push(newProduct)
-            .then(() => {
+            .then((snapshot) => {
                 // Limpar os campos de entrada após adicionar o produto
                 document.getElementById('productName').value = '';
                 document.getElementById('productImage').value = '';
                 document.getElementById('productLink').value = '';
                 // Atualizar a lista de produtos após adicionar
-                addProductsToAdmin();
+                addProductToAdminUI(snapshot.key, newProduct);
+                addProductToClientUI(newProduct);
             })
             .catch(error => {
                 console.error('Erro ao adicionar produto:', error);
@@ -113,21 +157,44 @@
 
     // Função para adicionar produtos ao admin
     function addProductsToAdmin() {
-        const productsListContainer = document.getElementById('products-list-admin');
-        productsListContainer.innerHTML = ''; // Limpar conteúdo anterior
-
+        productsRef.once('value', snapshot => {
+            const products = snapshot.val();
+            document.getElementById('products-list-admin').innerHTML = ''; // Limpar conteúdo anterior
+            if (products) {
+                Object.keys(products).forEach(key => {
+                    addProductToAdminUI(key, products[key]);
+                });
+            }
+        });
     }
 
     // Função para adicionar produtos ao cliente
     function addProductsToClient() {
-        const productsListContainer = document.getElementById('products-list-cliente');
-        productsListContainer.innerHTML = ''; // Limpar conteúdo anterior
+        productsRef.once('value', snapshot => {
+            const products = snapshot.val();
+            document.getElementById('products-list-cliente').innerHTML = ''; // Limpar conteúdo anterior
+            if (products) {
+                Object.keys(products).forEach(key => {
+                    addProductToClientUI(products[key]);
+                });
+            }
+        });
+    }
 
-       
+    // Função para criar elemento de produto no admin
+    function addProductToAdminUI(key, product) {
+        const productElement = createProductElement(product, key);
+        document.getElementById('products-list-admin').appendChild(productElement);
+    }
+
+    // Função para criar elemento de produto no cliente
+    function addProductToClientUI(product) {
+        const productElement = createProductElement(product);
+        document.getElementById('products-list-cliente').appendChild(productElement);
     }
 
     // Função para criar elemento de produto
-    function createProductElement(product) {
+    function createProductElement(product, key = null) {
         const productElement = document.createElement('div');
         productElement.classList.add('product-item');
         productElement.classList.add('card');
@@ -138,7 +205,7 @@
             <div class="product-image">
                 <img src="${product.image}" alt="${product.name}">
             </div>
-            <button class="excluir" onclick="deleteProduct('${product.key}')">Excluir</button>
+            <button class="excluir" onclick="deleteProduct('${key}')">Excluir</button>
         `;
         return productElement;
     }
