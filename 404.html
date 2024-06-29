@@ -11,30 +11,6 @@
     <link rel="stylesheet" href="siteprincipal.css">
     <link rel="stylesheet" href="siteadm.css">
     <link rel="stylesheet" href="sitecliente.css">
-    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-database.js"></script>
-
-    <script>
-        // Configuração do Firebase
-        const firebaseConfig = {
-            apiKey: "SUA_API_KEY",
-            authDomain: "SEU_AUTH_DOMAIN",
-            projectId: "SEU_PROJECT_ID",
-            storageBucket: "SEU_STORAGE_BUCKET",
-            messagingSenderId: "SEU_SENDER_ID",
-            appId: "SEU_APP_ID",
-            measurementId: "SUA_MEDIDA_ID"
-        };
-
-        // Inicialize o Firebase
-        firebase.initializeApp(firebaseConfig);
-
-        // Referência para o banco de dados do Firebase
-        const database = firebase.database();
-        
-        // Referência para o nó 'products'
-        const productsRef = database.ref('products');
-    </script>
 
 </head>
 <body>
