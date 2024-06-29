@@ -14,7 +14,7 @@
 
 </head>
 <body>
-
+'
 <!-- sitePrincipal -->
 <div id="sitePrincipal">
     <img class="logo" src="logo.jpg" alt="">
@@ -116,15 +116,6 @@
         const productsListContainer = document.getElementById('products-list-admin');
         productsListContainer.innerHTML = ''; // Limpar conteúdo anterior
 
-        // Obter os produtos do Firebase e exibir
-        productsRef.once('value', snapshot => {
-            snapshot.forEach(childSnapshot => {
-                const product = childSnapshot.val();
-                product.key = childSnapshot.key; // Adicionar a chave do produto
-                const productElement = createProductElement(product);
-                productsListContainer.appendChild(productElement);
-            });
-        });
     }
 
     // Função para adicionar produtos ao cliente
@@ -132,14 +123,7 @@
         const productsListContainer = document.getElementById('products-list-cliente');
         productsListContainer.innerHTML = ''; // Limpar conteúdo anterior
 
-        // Obter os produtos do Firebase e exibir
-        productsRef.once('value', snapshot => {
-            snapshot.forEach(childSnapshot => {
-                const product = childSnapshot.val();
-                const productElement = createProductElement(product);
-                productsListContainer.appendChild(productElement);
-            });
-        });
+       
     }
 
     // Função para criar elemento de produto
